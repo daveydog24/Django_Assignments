@@ -1,0 +1,54 @@
+...all teams in the Atlantic Soccer Conference
+Team.objects.filter(league = League.objects.filter(name = "Atlantic Soccer Conference"))
+
+...all (current) players on the Boston Penguins
+Player.objects.filter(curr_team = Team.objects.filter(team_name="Penguins"))
+
+...all (current) players in the International Collegiate Baseball Conference
+Player.objects.filter(curr_team = Team.objects.filter(league= League.objects.filter(name="International Collegiate Baseball Conference)))
+
+...all (current) players in the American Conference of Amateur Football with last name "Lopez"
+Player.objects.filter(curr_team = Team.objects.filter(league= League.objects.filter(name="American Conference of Amateur Football"))).filter(last_name="Lopez")
+
+...all football players
+Player.objects.filter(all_teams = Team.objects.filter(league= League.objects.filter(sport__contains="football")))
+
+...all teams with a (current) player named "Sophia"
+Team.objects.filter(curr_players = Player.objects.filter(first_name="Sophia"))
+
+...all leagues with a (current) player named "Sophia"
+League.objects.filter(teams = Team.objects.filter(curr_players = Player.objects.filter(first_name="Sophia")))
+
+...everyone with the last name "Flores" who DOESN'T (currently) play for the Washington Roughriders
+Player.objects.filter(last_name="Flores").exclude(curr_team = Team.objects.exclude(team_name="Washington Roughriders"))
+
+...all teams, past and present, that Samuel Evans has played with
+Team.objects.filter(curr_players = Player.objects.filter(first_name="Samuel", last_name="Evans"), all_players = Player.objects.filter(first_name="Samuel", last_name="Evans"))
+
+...all players, past and present, with the Manitoba Tiger-Cats
+Player.objects.filter(all_teams= Team.objects.filter(location="Manitoba", team_name="Tiger-Cats"))
+
+...all players who were formerly (but aren't currently) with the Wichita Vikings
+Player.objects.filter(all_teams= Team.objects.filter(location="Wichita", team_name="Vikings")).exclude(curr_team = Team.objects.filter(location="Wichita", team_name="Vikings")) 
+
+...every team that Jacob Gray played for before he joined the Oregon Colts
+Team.objects.filter(all_players = Player.objects.filter(first_name="Jacob", last_name="Gray")).exclude(location="Oregon", team_name="Colts")
+
+...everyone named "Joshua" who has ever played in the Atlantic Federation of Amateur Baseball Players
+Player.objects.filter(first_name="Joshua").filter(all_teams = Team.objects.filter(league= League.objects.filter(name="Atlantic Federation of Amateur Baseball Players")))
+
+...all teams that have had 12 or more players, past and present. (HINT: Look up the Django annotate function.)
+Team.objects.annotate(num_players=Count('all_players')).filter(num_players__gte=12)
+
+...all players and count of teams played for, sorted by the number of teams they've played for
+Player.objects.annotate(num_teams=Count('all_teams')).order_by("-num_teams")
+
+^^^^^^^^^^^^^^^ idk how to do the last one :( 
+
+
+notes below for practice vvvvvvvvvv
+
+Team.objects.annotate(num_players=Count(all_players))
+Team.objects.filter(num_players < 12 = annotate(num_players=Count('all_players')).aggregate(Avg('num_players'))
+Book.objects.annotate(num_authors=Count('authors')).aggregate(Avg('num_authors'))
+Book.objects.annotate(num_authors=Count('authors')).order_by('num_authors')
